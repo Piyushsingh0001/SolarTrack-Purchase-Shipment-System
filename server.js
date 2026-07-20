@@ -4,7 +4,7 @@ const path = require('path');
 const { exec } = require('child_process');
 const { DatabaseSync } = require('node:sqlite');
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, 'SolarPurchaseTracker');
 const DB_PATH = path.join(__dirname, 'solartrack.db');
 
@@ -509,15 +509,22 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log('======================================================');
-  console.log(`SolarTrack Server running with SQLite database at:`);
-  console.log(`http://localhost:${PORT}/`);
-  console.log('======================================================');
-  
-  // Auto-open browser
-  const url = `http://localhost:${PORT}/`;
-  const startCmd = process.platform === 'win32' ? `start ${url}` : `open ${url}`;
-  exec(startCmd, (err) => {
-    if (err) console.log(`Please open your browser and navigate to ${url}`);
-  });
+  console.log("======================================================");
+  console.log("SolarTrack Server Started");
+  console.log(`Listening on Port: ${PORT}`);
+  console.log("SQLite Database Connected");
+  console.log("======================================================");
+
+  // Open browser only on local Windows machine
+  if (process.env.RENDER !== "true") {
+    const url = `http://localhost:${PORT}/`;
+    const startCmd =
+      process.platform === "win32"
+        ? `start ${url}`
+        : process.platform === "darwin"
+        ? `open ${url}`
+        : `xdg-open ${url}`;
+
+    exec(startCmd, () => {});
+  }
 });
